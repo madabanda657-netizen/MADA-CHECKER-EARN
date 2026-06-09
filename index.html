@@ -85,7 +85,6 @@
 .airtel-banner { background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%); padding: 12px; border-radius: 10px 10px 0 0; margin-top: 8px; display: flex; align-items: center; gap: 8px; color: #fff; font-weight: bold; }
 .airtel-banner span:first-child { font-size: 24px; }
 
-/* ★ NEW: Inbox Delete & Save Photo button styles ★ */
 .inbox-actions-row { display: flex; gap: 6px; margin-top: 4px; justify-content: flex-end; }
 .inbox-action-btn { font-size: 11px !important; padding: 4px 10px !important; border-radius: 6px !important; border: none !important; cursor: pointer !important; font-weight: bold !important; width: auto !important; margin: 0 !important; display: inline-flex !important; align-items: center !important; gap: 3px !important; transition: opacity 0.2s, transform 0.15s !important; }
 .inbox-action-btn:active { transform: scale(0.95); }
@@ -212,7 +211,6 @@
 </div>
 <div class="card"><h3>💸 Withdraw</h3><select id="withdrawAmount"><option value="100">100 MWK</option><option value="200">200 MWK</option><option value="500">500 MWK</option></select><button onclick="submitWithdrawRequest()">Request Withdrawal</button><p id="msg" style="margin-top:10px;"></p></div><div class="card"><h3>📜 Withdrawal History</h3><div id="myWithdrawHistory" class="history-list" style="border-top:none; padding-top:0; margin-top:0;"></div></div><div class="card" style="border-color:#ff6b6b44"><h3>⚠️ Rules</h3><div style="text-align:left;color:#ccc;line-height:1.8;font-size:12px">1. Process time up to <b style="color:#fff">3 hours</b>.<br>2. Min withdrawal 100 MWK.<br>3. Withdrawals sent to your registered phone number.<br>4. Fake activity = Permanent ban.</div></div><div style="margin-top:20px;padding:20px;background:#111;border-radius:15px;border:1px solid #222"><div style="font-size:28px;margin-bottom:10px">🔞</div><p style="color:#ff6b6b;font-weight:bold;font-size:16px">18+ Only</p><div style="display:flex;justify-content:center;gap:15px;font-size:13px;margin:15px 0"><a href="#" onclick="document.getElementById('termsModal').style.display='flex';return false" style="color:#00ccff">Terms</a><a href="#" onclick="document.getElementById('privacyModal').style.display='flex';return false" style="color:#00ccff">Privacy</a></div><a href="https://chat.whatsapp.com/CmvdLsifPKS51OyRnrITFz" target="_blank" style="display:block;background:#25d366;color:#fff;padding:12px;border-radius:10px;text-decoration:none;font-weight:bold;font-size:14px">💬 Join WhatsApp Group</a></div></div>
 
-<!-- ★ CHANGED: "Each grade can only be played ONCE" → "Play any grade anytime!" ★ -->
 <div id="playPage" class="page"><h1>♟️ PvP Checkers</h1><p style="color:#ccc;margin-bottom:20px">Choose stake and play for real money! ♟️ Play any grade anytime — no limits!</p><div class="grade-grid" id="gradeGrid"></div><div class="card" style="margin-top:30px"><h3>📜 Game Rules (Malawi)</h3><div style="text-align:left;color:#ccc;line-height:1.8;font-size:13px">1. Fee deducted immediately.<br>2. Matched with real player.<br>3. Winner takes 80%.<br>4. 20% platform fee.<br>5. Disconnect = lose.<br>6. <b style="color:#fff">Capture backward is allowed.</b><br>7. <b style="color:#fff">Multiple jumps are forced.</b> (Keep jumping!).<br>8. If you can capture, you must capture.<br>9. <b style="color:#fff">Only Kings can fly (long jumps).</b><br><br><b style="color:#ffd700">⚖️ Draw Rules:</b><br>10. <b style="color:#00ffcc">King vs King</b> = Immediate draw (both refunded).<br>11. <b style="color:#00ffcc">One piece left</b> = Opponent gets <b style="color:#ffd700">12 moves</b> to catch it. If not caught = draw (both refunded).</div></div></div>
 
 <div id="inboxPage" class="page">
@@ -297,7 +295,6 @@ try {
 var DAILY_LIMIT = 12000; var gameState = {}; var captchaAnswer = 0;
 var PVP_GRADES = [ { id: 1, name: 'Grade 1', entryMWK: 50, winMWK: 80, icon: '🥉' }, { id: 2, name: 'Grade 2', entryMWK: 200, winMWK: 320, icon: '🥈' }, { id: 3, name: 'Grade 3', entryMWK: 500, winMWK: 800, icon: '🥇' }, { id: 4, name: 'Grade 4', entryMWK: 1000, winMWK: 1600, icon: '💎' } ];
 var myUid = null; var myPlayerNumber = 0; var currentGameId = null; var gameListener = null; var processedGameEnds = {};
-/* ★ REMOVED: playedGradesCache, hasPlayedGrade, markGradeAsPlayed, loadPlayedGrades — no more limits! ★ */
 
 function escapeHtml(t){if(!t)return'';var d=document.createElement('div');d.textContent=t;return d.innerHTML}
 function generateCaptcha(){var a=Math.floor(Math.random()*10)+1;var b=Math.floor(Math.random()*10)+1;captchaAnswer=a+b;var el=document.getElementById('captchaQ');if(el)el.innerText=a+' + '+b}
@@ -417,7 +414,6 @@ function loadReferralData(){if(!db||!myUid)return;var bu=window.location.href.sp
 function copyRefLink(){var ct=document.getElementById("refLinkInput");if(navigator.clipboard)navigator.clipboard.writeText(ct.value);else{ct.select();document.execCommand("copy")}alert("Copied!")}
 function claimReferralBonus(){if(!db||!myUid)return;db.ref('referrals/'+myUid).once('value',function(s){var c=s.numChildren();db.ref('leaderboard_all/'+myUid).once('value',function(us){var ud=us.val()||{},cl=ud.referralClaimed||0,uc=Math.floor(c/5)-cl;if(uc>0){db.ref('leaderboard_all/'+myUid).update({coins:(ud.coins||0)+(uc*10),referralClaimed:cl+uc},function(e){if(!e){alert('🎉 Claimed MWK '+(uc*10)+'!');showBalance();loadReferralData()}})}})})}
 
-/* ★ CHANGED: renderGrades - no more PLAYED badges or disabled cards ★ */
 function renderGrades(){
   var g=document.getElementById('gradeGrid'),h='';
   PVP_GRADES.forEach(function(gr){
@@ -432,7 +428,6 @@ function renderGrades(){
   showBalance();
 }
 
-/* ★ CHANGED: joinPvP - removed hasPlayedGrade check, unlimited plays! ★ */
 function joinPvP(gid){
   if(!db||!myUid){alert('Login first');return}
   var gr=PVP_GRADES.find(function(g){return g.id===gid});
@@ -455,14 +450,18 @@ if(db){db.ref('pvp_queue').on('value',function(s){
     if(pl.length>=2&&(pl.indexOf(myUid)>=0)){
       var sorted=pl.slice().sort();
       var p1=sorted[0],p2=sorted[1];
-      var gameId='game_'+gid+'_'+p1+'_'+p2;
+      /* FIX 1: Unique Game ID with Timestamp to prevent rematches from blocking */
+      var gameId='game_'+gid+'_'+p1+'_'+p2+'_'+Date.now();
       db.ref('pvp_queue/'+gid+'/'+p1).remove();
       db.ref('pvp_queue/'+gid+'/'+p2).remove();
       var gd=PVP_GRADES.find(function(g){return g.id===parseInt(gid)});
       var ib=[];
       for(var r=0;r<8;r++){for(var c=0;c<8;c++){ib.push((r+c)%2&&r<3?-1:(r+c)%2&&r>4?1:0)}}
+      /* FIX 2: Allow overwriting a finished game if collision happens */
       db.ref('pvp_games/'+gameId).transaction(function(data){
-        if(data===null){return{p1:p1,p2:p2,gradeId:gid,winMWK:gd.winMWK,entryMWK:gd.entryMWK,board:ib,turn:1,status:'playing',winner:null,created:Date.now(),drawCounter:0,drawTargetPlayer:0};}
+        if(data===null || (data && data.status==='finished')){
+          return{p1:p1,p2:p2,gradeId:gid,winMWK:gd.winMWK,entryMWK:gd.entryMWK,board:ib,turn:1,status:'playing',winner:null,created:Date.now(),drawCounter:0,drawTargetPlayer:0};
+        }
         return data;
       });
     }
@@ -476,14 +475,50 @@ function initGameListeners(){
   db.ref('pvp_games').orderByChild('p1').equalTo(myUid).on('value',handleGameUpdate);
   db.ref('pvp_games').orderByChild('p2').equalTo(myUid).on('value',handleGameUpdate);
 }
-function handleGameUpdate(s){if(!myUid)return;s.forEach(function(c){var g=c.val();if(g&&(g.p1===myUid||g.p2===myUid)&&g.status==='playing'){if(currentGameId!==c.key){currentGameId=c.key;myPlayerNumber=g.p1===myUid?1:2;document.getElementById('searchingOverlay').style.display='none';showPage('game');startGameListener(c.key)}}else if(g&&g.status==='finished'&&currentGameId===c.key){endPvPGame(g)}})}
-function startGameListener(gid){if(gameListener)db.ref('pvp_games/'+gameListener).off();gameListener=gid;db.ref('pvp_games/'+gid).on('value',function(s){var g=s.val();if(!g)return;gameState=g;renderPvPBoard()})}
+
+/* FIX 4: Robust handleGameUpdate with explicit ownership check */
+function handleGameUpdate(s){
+  if(!myUid)return;
+  s.forEach(function(c){
+    var g=c.val();
+    if(!g)return;
+    if(g.p1!==myUid&&g.p2!==myUid)return; // Safety check to prevent hijacking
+    if(g.status==='playing'){
+      if(currentGameId!==c.key){
+        currentGameId=c.key;
+        myPlayerNumber=g.p1===myUid?1:2;
+        document.getElementById('searchingOverlay').style.display='none';
+        showPage('game');
+        startGameListener(c.key);
+      }
+    }else if(g.status==='finished'&&currentGameId===c.key){
+      endPvPGame(g);
+    }
+  });
+}
+
+/* FIX 5: Added game-end detection inside the specific listener */
+function startGameListener(gid){
+  if(gameListener)db.ref('pvp_games/'+gameListener).off();
+  gameListener=gid;
+  db.ref('pvp_games/'+gid).on('value',function(s){
+    var g=s.val();
+    if(!g)return;
+    gameState=g;
+    renderPvPBoard();
+    // Catch game end if handleGameUpdate hasn't triggered it yet
+    if(g.status==='finished'&&currentGameId===gid){
+      endPvPGame(g);
+    }
+  });
+}
+
 function renderPvPBoard(){var be=document.getElementById('checkersBoard'),h='';document.getElementById('p1Name').innerText='🔴 '+(gameState.p1===myUid?'You':gameState.p1);document.getElementById('p2Name').innerText='⚫ '+(gameState.p2===myUid?'You':gameState.p2);document.getElementById('gameStake').innerText=gameState.entryMWK+' MWK';document.getElementById('gamePrize').innerText=gameState.winMWK+' MWK';var imt=gameState.turn===myPlayerNumber;var isMultiJump=imt&&gameState.selected&&gameState.validMoves&&gameState.validMoves.length>0;document.getElementById('turnIndicator').innerText=isMultiJump?'⚡ Must Jump!':(imt?'🎯 Your Turn!':'⏳ Opponent');document.getElementById('turnIndicator').style.color=isMultiJump?'#ffd700':(imt?'#51cf66':'#ff6b6b');var db2=document.getElementById('drawCounterBar'),dt=gameState.drawTargetPlayer||0,dc=gameState.drawCounter||0;if(dt>0&&dc>0){db2.style.display='block';db2.innerText='⏱️ Draw in '+(12-dc)+' moves'}else db2.style.display='none';var b=gameState.board.slice();var sel=gameState.selected||null,vm=gameState.validMoves||[];for(var i=0;i<64;i++){var displayR=Math.floor(i/8),displayC=i%8;var boardR=myPlayerNumber===2?7-displayR:displayR;var boardC=myPlayerNumber===2?7-displayC:displayC;var boardIdx=boardR*8+boardC;var isDark=(displayR+displayC)%2===1;var p=b[boardIdx];var sc=sel&&sel[0]===boardR&&sel[1]===boardC?'selected':'';var mc=vm.some(function(m){return m[0]===boardR&&m[1]===boardC})?'valid-move':'';h+='<div class="square '+(isDark?'dark':'light')+' '+sc+' '+mc+'" onclick="clickPvPSquare('+displayR+','+displayC+')">';if(p!==0)h+='<div class="piece '+(p>0?'p1':'p2')+' '+(Math.abs(p)===2?'king':'')+'"></div>';h+='</div>'}be.innerHTML=h}
 function clickPvPSquare(r,c){if(gameState.turn!==myPlayerNumber)return;if(!db||!currentGameId)return;if(myPlayerNumber===2){r=7-r;c=7-c}var b=gameState.board,cv=b[r*8+c],sel=gameState.selected,vm=gameState.validMoves||[];if(sel&&vm.some(function(m){return m[0]===r&&m[1]===c})){makePvPMove(sel[0],sel[1],r,c);return}if((myPlayerNumber===1&&cv>0)||(myPlayerNumber===2&&cv<0)){var pl=myPlayerNumber;var allMoves=getAllCaptures(b,pl);var mustCapture=allMoves.length>0;var pieceMoves=getValidMovesForPiece(b,r,c,pl);var filteredMoves=[];for(var i=0;i<pieceMoves.length;i++){if(mustCapture&&pieceMoves[i].captured.length===0)continue;filteredMoves.push(pieceMoves[i].to)}if(filteredMoves.length>0)db.ref('pvp_games/'+currentGameId).update({selected:[r,c],validMoves:filteredMoves});else db.ref('pvp_games/'+currentGameId).update({selected:null,validMoves:[]})}else{db.ref('pvp_games/'+currentGameId).update({selected:null,validMoves:[]})}}
 
-function getCapturesForPiece(b, r, c, pl) { var p=b[r*8+c]; if(Math.sign(p)!==pl) return []; var caps=[], isKing=Math.abs(p)===2, dirs=[-1,1], dcs=[-1,1]; for(var d=0;d<dirs.length;d++){for(var dc=0;dc<2;dc++){ if(isKing){var dist=1,enm=null;while(true){var nr=r+dist*dirs[d],nc=c+dist*dcs[dc];if(nr<0||nr>=8||nc<0||nc>=8)break;if(b[nr*8+nc]!==0){if(Math.sign(b[nr*8+nc])===(-pl)&&!enm)enm=[nr,nc];else break}else if(enm){caps.push({from:[r,c],to:[nr,nc],captured:enm})}dist++}} else{var mr=r+dirs[d],mc=c+dcs[dc],jr=r+2*dirs[d],jc=c+2*dcs[dc];if(jr>=0&&jr<8&&jc>=0&&jc<8&&Math.sign(b[mr*8+mc])===(-pl)&&b[jr*8+jc]===0)caps.push({from:[r,c],to:[jr,jc],captured:[[mr,mc]]})} }} return caps; }
-function getAllCaptures(b, pl) { var caps=[]; for(var r=0;r<8;r++){for(var c=0;c<8;c++){if(Math.sign(b[r*8+c])===pl){var pc=getCapturesForPiece(b,r,c,pl);for(var i=0;i<pc.length;i++)caps.push(pc[i])}}} return caps; }
-function getSimpleMovesForPiece(b, r, c, pl) { var p=b[r*8+c]; if(Math.sign(p)!==pl) return []; var mvs=[], isKing=Math.abs(p)===2, dirs=isKing?[-1,1]:(pl===1?[-1]:[1]), dcs=[-1,1]; for(var d=0;d<dirs.length;d++){for(var dc=0;dc<2;dc++){ if(isKing){var dist=1;while(true){var nr=r+dist*dirs[d],nc=c+dist*dcs[dc];if(nr<0||nr>=8||nc<0||nc>=8)break;if(b[nr*8+nc]!==0)break;mvs.push({from:[r,c],to:[nr,nc],captured:[]});dist++}} else{var nr=r+dirs[d],nc=c+dcs[dc];if(nr>=0&&nr<8&&nc>=0&&nc<8&&b[nr*8+nc]===0)mvs.push({from:[r,c],to:[nr,nc],captured:[]})} }} return mvs; }
+function getCapturesForPiece(b, r, c, pl) { var s=pl===1?1:-1; var p=b[r*8+c]; if(Math.sign(p)!==s) return []; var caps=[], isKing=Math.abs(p)===2, dirs=[-1,1], dcs=[-1,1]; for(var d=0;d<dirs.length;d++){for(var dc=0;dc<2;dc++){ if(isKing){var dist=1,enm=null;while(true){var nr=r+dist*dirs[d],nc=c+dist*dcs[dc];if(nr<0||nr>=8||nc<0||nc>=8)break;if(b[nr*8+nc]!==0){if(Math.sign(b[nr*8+nc])===(-s)&&!enm)enm=[nr,nc];else break}else if(enm){caps.push({from:[r,c],to:[nr,nc],captured:enm})}dist++}} else{var mr=r+dirs[d],mc=c+dcs[dc],jr=r+2*dirs[d],jc=c+2*dcs[dc];if(jr>=0&&jr<8&&jc>=0&&jc<8&&Math.sign(b[mr*8+mc])===(-s)&&b[jr*8+jc]===0)caps.push({from:[r,c],to:[jr,jc],captured:[[mr,mc]]})} }} return caps; }
+function getAllCaptures(b, pl) { var s=pl===1?1:-1; var caps=[]; for(var r=0;r<8;r++){for(var c=0;c<8;c++){if(Math.sign(b[r*8+c])===s){var pc=getCapturesForPiece(b,r,c,pl);for(var i=0;i<pc.length;i++)caps.push(pc[i])}}} return caps; }
+function getSimpleMovesForPiece(b, r, c, pl) { var s=pl===1?1:-1; var p=b[r*8+c]; if(Math.sign(p)!==s) return []; var mvs=[], isKing=Math.abs(p)===2, dirs=isKing?[-1,1]:(pl===1?[-1]:[1]), dcs=[-1,1]; for(var d=0;d<dirs.length;d++){for(var dc=0;dc<2;dc++){ if(isKing){var dist=1;while(true){var nr=r+dist*dirs[d],nc=c+dist*dcs[dc];if(nr<0||nr>=8||nc<0||nc>=8)break;if(b[nr*8+nc]!==0)break;mvs.push({from:[r,c],to:[nr,nc],captured:[]});dist++}} else{var nr=r+dirs[d],nc=c+dcs[dc];if(nr>=0&&nr<8&&nc>=0&&nc<8&&b[nr*8+nc]===0)mvs.push({from:[r,c],to:[nr,nc],captured:[]})} }} return mvs; }
 function getValidMovesForPiece(b, r, c, pl) { if(getAllCaptures(b,pl).length>0) return getCapturesForPiece(b,r,c,pl); return getSimpleMovesForPiece(b,r,c,pl); }
 
 function makePvPMove(fR,fC,tR,tC){
@@ -509,26 +544,66 @@ function makePvPMove(fR,fC,tR,tC){
   db.ref('pvp_games/'+currentGameId).update(u);
 }
 
-/* ★ CHANGED: endPvPGame - removed markGradeAsPlayed call ★ */
+/* FIX 3: Full state reset synchronously before async calls + FIX 6 cleanup */
 function endPvPGame(g){
   if(!currentGameId)return;
-  if(processedGameEnds[currentGameId]){currentGameId=null;showPage('profile');return}
+  if(processedGameEnds[currentGameId]){
+    currentGameId=null;
+    gameState={};
+    gameListener=null;
+    myPlayerNumber=0;
+    showPage('profile');
+    return;
+  }
   processedGameEnds[currentGameId]=true;
-  db.ref('pvp_games/'+currentGameId).off();
+
+  // Capture and clear IMMEDIATELY — don't wait for async
+  var endedGameId=currentGameId;
+  currentGameId=null;
+  gameState={};
+  if(gameListener){db.ref('pvp_games/'+gameListener).off();}
+  gameListener=null;
+  myPlayerNumber=0;
+
   var id=g.winner==='draw',iw=!id&&g.winner===myUid;
   if(id)playSound('move');else if(iw)playSound('win');else playSound('lose');
+
   db.ref('leaderboard_all/'+myUid).once('value',function(s){
     var d=s.val()||{},u={};
     if(id){
-      u.coins=(d.coins||0)+g.entryMWK;u.gamesPlayed=(parseInt(d.gamesPlayed)||0)+1;
-      db.ref('leaderboard_all/'+myUid).update(u,function(){alert('🤝 DRAW! MWK '+g.entryMWK+' refunded.');currentGameId=null;showPage('profile')})
+      u.coins=(d.coins||0)+g.entryMWK;
+      u.gamesPlayed=(parseInt(d.gamesPlayed)||0)+1;
+      db.ref('leaderboard_all/'+myUid).update(u,function(){
+        alert('🤝 DRAW! MWK '+g.entryMWK+' refunded.');
+        showPage('profile');
+      });
     }else{
-      u.gamesPlayed=(parseInt(d.gamesPlayed)||0)+1;u.gamesWon=(parseInt(d.gamesWon)||0)+(iw?1:0);u.gamesLost=(parseInt(d.gamesLost)||0)+(iw?0:1);
+      u.gamesPlayed=(parseInt(d.gamesPlayed)||0)+1;
+      u.gamesWon=(parseInt(d.gamesWon)||0)+(iw?1:0);
+      u.gamesLost=(parseInt(d.gamesLost)||0)+(iw?0:1);
       if(iw)u.coins=(d.coins||0)+g.winMWK;
-      db.ref('leaderboard_all/'+myUid).update(u,function(){alert(iw?'🎉 YOU WIN! +MWK '+g.winMWK:'😞 You Lost! MWK '+g.entryMWK);currentGameId=null;showPage('profile')})
+      db.ref('leaderboard_all/'+myUid).update(u,function(){
+        alert(iw?'🎉 YOU WIN! +MWK '+g.winMWK:'😞 You Lost! MWK '+g.entryMWK);
+        showPage('profile');
+      });
     }
-  })
+  });
+
+  // Clean up old processedGameEnds (prevent memory leak)
+  var now=Date.now();
+  processedGameEnds[endedGameId]=now;
+  Object.keys(processedGameEnds).forEach(function(k){
+    if(typeof processedGameEnds[k]==='number' && now-processedGameEnds[k]>300000){
+      delete processedGameEnds[k];
+    }
+  });
+
+  // Remove old game data from Firebase after a short delay
+  setTimeout(function(){
+    if(db) db.ref('pvp_games/'+endedGameId).remove();
+  }, 5000);
 }
+
 function cancelMatchmaking(){if(db&&myUid){db.ref('pvp_queue').once('value',function(s){s.forEach(function(gs){if(gs.val()&&gs.val()[myUid]){var gid=gs.key,gr=PVP_GRADES.find(function(g){return g.id===parseInt(gid)});db.ref('pvp_queue/'+gid+'/'+myUid).remove();db.ref('leaderboard_all/'+myUid+'/coins').once('value',function(cs){db.ref('leaderboard_all/'+myUid).update({coins:(cs.val()||0)+gr.entryMWK})})}})})}document.getElementById('searchingOverlay').style.display='none'}
 function exitGame(){if(confirm('Leave & FORFEIT?')){if(db&&currentGameId)db.ref('pvp_games/'+currentGameId).update({status:'finished',winner:myPlayerNumber===1?gameState.p2:gameState.p1})}}
 function submitDepositRequest(){if(!db||!myUid)return;var a=parseInt(document.getElementById("depositAmountInput").value),tx=(document.getElementById("depositTxIdInput").value||"").trim(),m=document.getElementById("depositMsg");if(!a||a<50){m.innerHTML='<span class="error">Minimum 50 MWK</span>';return}if(!tx||tx.length<4){m.innerHTML='<span class="error">Enter valid TxID</span>';return}m.innerHTML='<span class="success">Saving...</span>';db.ref('deposit_requests').push({uid:myUid,amountMWK:a,txId:tx,status:'pending',timestamp:Date.now()},function(e){if(e){m.innerHTML='<span class="error">Failed</span>'}else{alert("✅ Deposit Request Submitted!");document.getElementById("depositAmountInput").value='';document.getElementById("depositTxIdInput").value='';m.innerHTML='<span class="success">Opening Chat...</span>';showPage('inbox');var ii=document.getElementById('inboxMsgInput');if(ii){ii.value="I deposited MWK "+a+". TxID: "+tx+". Screenshot:";ii.focus()}}})}
@@ -537,13 +612,10 @@ function listenMyDeposits(){if(!db||!myUid)return;db.ref('deposit_requests').ord
 function listenMyWithdrawals(){if(!db||!myUid)return;db.ref('withdraw_requests').orderByChild('uid').equalTo(myUid).on('value',function(s){var h='';if(!s.exists())h='<div style="text-align:center;color:#555;font-size:12px;padding:10px;">No withdrawals yet</div>';s.forEach(function(c){var r=c.val();var sh=r.status==='pending'?'<span class="history-status-pending">⏳ Pending</span>':r.status==='approved'?'<span class="history-status-approved">✅ Approved</span>':r.status==='declined'?'<span class="history-status-declined">❌ Declined</span>':'<span class="history-status-'+r.status+'">'+r.status+'</span>';h+='<div class="history-item"><div><span style="color:#fff">MWK '+r.amountMWK+'</span><br><span style="color:#555;font-size:10px">'+new Date(r.timestamp).toLocaleDateString()+'</span></div>'+sh+'</div>'});document.getElementById('myWithdrawHistory').innerHTML=h})}
 var inboxFileData=null,inboxFileName=null;
 
-/* ★ NEW: Cache for inbox messages (needed for save photo feature) ★ */
 var inboxMessagesCache = {};
 
-/* ★ UPDATED: loadInbox - now includes Delete button and Save Photo button ★ */
 function loadInbox(){if(!db||!myUid)return;db.ref('admin_inbox/'+myUid+'/messages').orderByChild('timestamp').on('value',function(s){var h='';inboxMessagesCache={};s.forEach(function(c){var m=c.val(),im=m.from==='user',ch='';inboxMessagesCache[c.key]=m;if(m.image)ch+='<img src="'+m.image+'" class="inbox-img" onclick="openImageViewer(this.src)">';if(m.image)ch+='<button onclick="saveInboxPhoto(\''+c.key+'\')" class="inbox-action-btn inbox-save-btn">💾 Save Photo</button>';if(m.fileData)ch+='<a href="'+m.fileData+'" download="'+(m.fileName||'file')+'" class="inbox-file">📎 '+(m.fileName||'File')+'</a>';if(m.text)ch+='<div style="color:#fff;font-size:14px;white-space:pre-wrap;">'+escapeHtml(m.text)+'</div>';h+='<div class="inbox-item" id="inbox-msg-'+c.key+'" style="'+(im?'text-align:right;background:#0a2a3a;':'text-align:left;background:#1a1a2e;')+'">';h+=ch;h+='<div class="inbox-meta"><span>'+(im?'You':'Admin')+'</span><span>'+new Date(m.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})+'</span></div>';h+='<div class="inbox-actions-row"><button onclick="deleteInboxMsg(\''+c.key+'\')" class="inbox-action-btn inbox-delete-btn">🗑️ Delete</button></div>';h+='</div>'});document.getElementById('inboxMessages').innerHTML=h||'<div style="text-align:center;color:#555;padding:20px;">No messages yet</div>';document.getElementById('inboxMessages').scrollTop=99999})}
 
-/* ★ NEW: Delete inbox message function ★ */
 function deleteInboxMsg(msgKey){
   if(!db||!myUid||!msgKey)return;
   if(!confirm('Delete this message?'))return;
@@ -557,7 +629,6 @@ function deleteInboxMsg(msgKey){
   });
 }
 
-/* ★ NEW: Save inbox photo function ★ */
 function saveInboxPhoto(msgKey){
   var msg=inboxMessagesCache[msgKey];
   if(!msg||!msg.image){
@@ -573,7 +644,6 @@ function saveInboxPhoto(msgKey){
     a.click();
     setTimeout(function(){document.body.removeChild(a)},500);
   }catch(e){
-    /* Fallback: open in image viewer so user can save from there */
     openImageViewer(msg.image);
     alert('Tap 💾 Save in the viewer to download the photo.');
   }
@@ -675,4 +745,4 @@ document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){va
 })();
 </script>
 </body>
-              </html>
+  </html>
