@@ -559,27 +559,32 @@ function submitWithdrawRequest(){
   var m=document.getElementById("msg");
   m.innerHTML='<span class="success">Processing...</span>';
   
-  // Check the whole user profile to see if they have deposited before
-  db.ref('leaderboard_all/'+myUid).once('value',function(s){
-    var d=s.val()||{};
-    var cb=d.mwk||0;
+  // SECURITY CHECK: Scan deposit history for an 'approved' deposit
+  db.ref('deposit_requests').orderByChild('uid').equalTo(myUid).once('value', function(depSnap) {
+    var hasApprovedDeposit = false;
+    depSnap.forEach(function(child) {
+      if(child.val().status === 'approved') hasApprovedDeposit = true;
+    });
     
-    // SECURITY CHECK: Have they ever deposited?
-    if(!d.hasDeposited){
+    if(!hasApprovedDeposit){
       m.innerHTML='<span class="error">⚠️ You must make at least one deposit before you can withdraw.</span>';
       return;
     }
     
-    if(cb<a){
-      m.innerHTML='<span class="error">Not enough balance!</span>';
-      return;
-    }
-    
-    db.ref('leaderboard_all/'+myUid).update({mwk:cb-a},function(e){
-      if(e){m.innerHTML='<span class="error">Error</span>';return}
-      db.ref('withdraw_requests').push({uid:myUid,amountMWK:a,status:'pending',timestamp:Date.now()},function(e2){
-        if(e2){m.innerHTML='<span class="error">Failed</span>'}
-        else{m.innerHTML='<span class="success">Requested!</span>';showBalance()}
+    // If they have deposited, proceed to check balance and withdraw
+    db.ref('leaderboard_all/'+myUid).once('value',function(s){
+      var d=s.val()||{};
+      var cb=d.mwk||0;
+      if(cb<a){
+        m.innerHTML='<span class="error">Not enough balance!</span>';
+        return;
+      }
+      db.ref('leaderboard_all/'+myUid).update({mwk:cb-a},function(e){
+        if(e){m.innerHTML='<span class="error">Error</span>';return}
+        db.ref('withdraw_requests').push({uid:myUid,amountMWK:a,status:'pending',timestamp:Date.now()},function(e2){
+          if(e2){m.innerHTML='<span class="error">Failed</span>'}
+          else{m.innerHTML='<span class="success">Requested!</span>';showBalance()}
+        });
       });
     });
   });
@@ -718,4 +723,4 @@ document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){va
 </script>
 
 </body>
-  </html>
+                                                                                                                                                                                                      </html>
