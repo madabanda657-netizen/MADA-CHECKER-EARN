@@ -190,6 +190,7 @@
 <div id="loginPage" class="page active">
     <img src="https://i.imgur.com/VGTXXkQ.jpeg" style="width:120px;height:auto;border-radius:15px;margin-bottom:10px;box-shadow:0 0 20px #00ffcc55">
     <h1>Mada Game Earn</h1>
+    <p style="color:#00ffcc; font-size:14px; margin-bottom:15px; font-weight:bold;">✅ Legit app for earning real money by playing draught with friends!</p>
     <div class="card" id="registerCard">
         <h3>👤 Create Account</h3>
         <input type="text" id="usernameInput" placeholder="Username (min 3 chars)" maxlength="20">
@@ -297,7 +298,7 @@
     <p id="depositMsg" style="margin-top:10px;"></p>
     <div id="myDepositHistory" class="history-list"></div>
 </div>
-<div class="card"><h3>💸 Withdraw</h3><select id="withdrawAmount"><option value="100">100 MWK</option><option value="200">200 MWK</option><option value="500">500 MWK</option></select><button onclick="submitWithdrawRequest()">Request Withdrawal</button><p id="msg" style="margin-top:10px;"></p></div><div class="card"><h3>📜 Withdrawal History</h3><div id="myWithdrawHistory" class="history-list" style="border-top:none; padding-top:0; margin-top:0;"></div></div><div class="card" style="border-color:#ff6b6b44"><h3>⚠️ Rules</h3><div style="text-align:left;color:#ccc;line-height:1.8;font-size:12px">1. Process time up to <b style="color:#fff">3 hours</b>.<br>2. Min withdrawal 100 MWK.<br>3. Withdrawals sent to your registered phone number.<br>4. Fake activity = Permanent ban.</div></div><div style="margin-top:20px;padding:20px;background:#111;border-radius:15px;border:1px solid #222"><div style="font-size:28px;margin-bottom:10px">🔞</div><p style="color:#ff6b6b;font-weight:bold;font-size:16px">18+ Only</p><div style="display:flex;justify-content:center;gap:15px;font-size:13px;margin:15px 0"><a href="#" onclick="document.getElementById('termsModal').style.display='flex';return false" style="color:#00ccff">Terms</a><a href="#" onclick="document.getElementById('privacyModal').style.display='flex';return false" style="color:#00ccff">Privacy</a></div><a href="https://chat.whatsapp.com/CmvdLsifPKS51OyRnrITFz" target="_blank" style="display:block;background:#25d366;color:#fff;padding:12px;border-radius:10px;text-decoration:none;font-weight:bold;font-size:14px">💬 Join WhatsApp Group</a></div></div>
+<div class="card"><h3>💸 Withdraw (Max: 50,000 MWK)</h3><select id="withdrawAmount"><option value="100">100 MWK</option><option value="200">200 MWK</option><option value="500">500 MWK</option><option value="1000">1,000 MWK</option><option value="2000">2,000 MWK</option><option value="5000">5,000 MWK</option><option value="10000">10,000 MWK</option><option value="20000">20,000 MWK</option><option value="50000">50,000 MWK</option></select><button onclick="submitWithdrawRequest()">Request Withdrawal</button><p id="msg" style="margin-top:10px;"></p></div><div class="card"><h3>📜 Withdrawal History</h3><div id="myWithdrawHistory" class="history-list" style="border-top:none; padding-top:0; margin-top:0;"></div></div><div class="card" style="border-color:#ff6b6b44"><h3>⚠️ Rules</h3><div style="text-align:left;color:#ccc;line-height:1.8;font-size:12px">1. Process time up to <b style="color:#fff">3 hours</b>.<br>2. Min withdrawal 100 MWK.<br>3. Withdrawals sent to your registered phone number.<br>4. Fake activity = Permanent ban.</div></div><div style="margin-top:20px;padding:20px;background:#111;border-radius:15px;border:1px solid #222"><div style="font-size:28px;margin-bottom:10px">🔞</div><p style="color:#ff6b6b;font-weight:bold;font-size:16px">18+ Only</p><div style="display:flex;justify-content:center;gap:15px;font-size:13px;margin:15px 0"><a href="#" onclick="document.getElementById('termsModal').style.display='flex';return false" style="color:#00ccff">Terms</a><a href="#" onclick="document.getElementById('privacyModal').style.display='flex';return false" style="color:#00ccff">Privacy</a></div><a href="https://chat.whatsapp.com/CmvdLsifPKS51OyRnrITFz" target="_blank" style="display:block;background:#25d366;color:#fff;padding:12px;border-radius:10px;text-decoration:none;font-weight:bold;font-size:14px">💬 Join WhatsApp Group</a></div></div>
 
 <div id="playPage" class="page"><h1>♟️ PvP Checkers</h1><p style="color:#ccc;margin-bottom:20px">Choose stake and play for real money! ♟️ Play any grade anytime — no limits!</p><div class="grade-grid" id="gradeGrid"></div><div class="card" style="margin-top:30px"><h3>📜 Game Rules (Malawi)</h3><div style="text-align:left;color:#ccc;line-height:1.8;font-size:13px">1. Fee deducted when match found.<br>2. Matched with real player.<br>3. Winner takes 80%.<br>4. 20% platform fee.<br>5. Disconnect = lose.<br>6. <b style="color:#fff">Capture backward is allowed.</b><br>7. <b style="color:#fff">Multiple jumps are forced.</b> (Keep jumping!).<br>8. If you can capture, you must capture.<br>9. <b style="color:#fff">Only Kings can fly (long jumps).</b><br><br><b style="color:#ffd700">⚖️ Draw Rules:</b><br>10. <b style="color:#00ffcc">King vs King</b> = Immediate draw (both refunded).<br>11. <b style="color:#00ffcc">One piece left</b> = Opponent gets <b style="color:#ffd700">12 moves</b> to catch it. If not caught = draw (both refunded).</div></div></div>
 
@@ -559,6 +560,12 @@ function submitWithdrawRequest(){
   var m=document.getElementById("msg");
   m.innerHTML='<span class="success">Processing...</span>';
   
+  // NEW: Check maximum withdrawal limit
+  if(a > 50000) {
+    m.innerHTML='<span class="error">⚠️ Maximum withdrawal is 50,000 MWK per request.</span>';
+    return;
+  }
+
   // SECURITY CHECK: Scan deposit history for an 'approved' deposit
   db.ref('deposit_requests').orderByChild('uid').equalTo(myUid).once('value', function(depSnap) {
     var hasApprovedDeposit = false;
@@ -723,4 +730,4 @@ document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){va
 </script>
 
 </body>
-                                                                                                                                                                                                      </html>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   </html>
