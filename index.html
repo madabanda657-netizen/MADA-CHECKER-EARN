@@ -27,15 +27,15 @@
 .checkers-board{
   display:grid;
   grid-template-columns:repeat(8,1fr);
-  border:8px solid #3b2612; /* Thick dark wood border */
+  border:8px solid #3b2612;
   border-radius:6px;
   overflow:hidden;
   aspect-ratio:1;
-  box-shadow:0 10px 25px rgba(0,0,0,0.8), inset 0 0 15px rgba(0,0,0,0.5); /* 3D Drop shadow */
+  box-shadow:0 10px 25px rgba(0,0,0,0.8), inset 0 0 15px rgba(0,0,0,0.5);
 }
 .square{aspect-ratio:1;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
-.square.dark{background:#8B4513; /* SaddleBrown */ box-shadow:inset 0 0 10px rgba(0,0,0,0.3)}
-.square.light{background:#F5DEB3; /* Wheat */ box-shadow:inset 0 0 10px rgba(139,69,19,0.1)}
+.square.dark{background:#8B4513;box-shadow:inset 0 0 10px rgba(0,0,0,0.3)}
+.square.light{background:#F5DEB3;box-shadow:inset 0 0 10px rgba(139,69,19,0.1)}
 .square.selected{outline:4px solid #ffd700;outline-offset:-4px;z-index:2;box-shadow:inset 0 0 15px rgba(255,215,0,0.5)}
 .square.valid-move::after{content:'';position:absolute;width:35%;height:35%;background:rgba(0,0,0,0.4);border-radius:50%;box-shadow:0 0 8px rgba(255,255,255,0.2)}
 
@@ -46,10 +46,10 @@
   border:2px solid #222;
   display:flex;align-items:center;justify-content:center;
   font-size:22px;color:#ffd700;z-index:1;
-  box-shadow:0 4px 6px rgba(0,0,0,0.6), inset 0 -4px 8px rgba(0,0,0,0.4), inset 0 4px 8px rgba(255,255,255,0.2); /* Beveled 3D edge */
+  box-shadow:0 4px 6px rgba(0,0,0,0.6), inset 0 -4px 8px rgba(0,0,0,0.4), inset 0 4px 8px rgba(255,255,255,0.2);
 }
-.piece.p1{background:radial-gradient(circle at 30% 30%, #e74c3c, #922b21); /* Red piece */}
-.piece.p2{background:radial-gradient(circle at 30% 30%, #2c3e50, #000000); /* Black piece */}
+.piece.p1{background:radial-gradient(circle at 30% 30%, #e74c3c, #922b21)}
+.piece.p2{background:radial-gradient(circle at 30% 30%, #2c3e50, #000000)}
 .piece.king::after{content:'♔';filter:drop-shadow(0px 2px 2px rgba(0,0,0,0.8))}
 
 .draw-counter-bar{display:none;padding:8px 12px;background:#1a1a0a;border-radius:8px;margin:8px 0;border:1px solid #ffd70044;text-align:center;font-size:14px;color:#ffd700;font-weight:bold;animation:pulse 1.5s infinite}
@@ -109,7 +109,7 @@
 .chat-back-btn{width:auto;padding:8px 14px;background:#1a1a1a;color:#00ffcc;border:1px solid #00ffcc44;border-radius:10px;cursor:pointer;font-size:14px;flex-shrink:0;margin:0}
 #imageViewerModal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.97); z-index: 10002; flex-direction: column; align-items: center; justify-content: center; padding: 10px; }
 #imageViewerModal .iv-top-bar { position: absolute; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: linear-gradient(180deg, rgba(0,0,0,0.8), transparent); z-index: 3; }
-#imageViewerModal .iv-img-wrap { flex: 1; display: flex; align-items:center; justify-content: center; width: 100%; min-height: 0; overflow: auto; -webkit-overflow-scrolling: touch; }
+#imageViewerModal .iv-img-wrap { flex: 1; display: flex; align-items: center; justify-content: center; width: 100%; min-height: 0; overflow: auto; -webkit-overflow-scrolling: touch; }
 #imageViewerModal img { max-width: 100%; max-height: 80vh; object-fit: contain; border-radius: 8px; user-select: none; -webkit-user-select: none; }
 .airtel-banner { background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%); padding: 12px; border-radius: 10px 10px 0 0; margin-top: 8px; display: flex; align-items: center; gap: 8px; color: #fff; font-weight: bold; }
 .airtel-banner span:first-child { font-size: 24px; }
@@ -182,7 +182,7 @@
 <div id="deleteAccountModal" class="profile-modal"><div class="profile-modal-content" style="border-color:#ff6b6b44;"><div style="font-size:50px;margin-bottom:10px;">⚠️</div><h3 style="color:#ff6b6b;margin-bottom:15px;">Delete Account</h3><p style="color:#ccc;font-size:13px;margin-bottom:15px;line-height:1.5;">This action <b style="color:#ff6b6b">cannot be undone</b>. All your data, balance, and history will be permanently deleted.</p><p style="color:#888;font-size:12px;margin-bottom:10px;">Type <b style="color:#ff6b6b">DELETE</b> to confirm:</p><input type="text" id="deleteConfirmInput" placeholder='Type "DELETE" to confirm' style="background:#0a0a0a;color:#ff6b6b;border:1px solid #ff6b6b44;margin-bottom:15px;text-align:center;"><div style="display:flex;gap:10px;justify-content:center;"><button onclick="confirmDeleteAccount()" style="width:auto;padding:10px 25px;background:linear-gradient(45deg,#ff6b6b,#c92a2a);color:#fff;">🗑️ Delete Forever</button><button onclick="closeDeleteAccountModal()" style="width:auto;padding:10px 25px;background:#333;color:#fff;">Cancel</button></div><p id="deleteAccountMsg" style="margin-top:10px;font-size:13px;"></p></div></div>
 
 <div id="searchingOverlay" class="searching-overlay"><div class="search-spinner"></div><h2 style="color:#00ffcc">Finding Opponent...</h2><p id="searchGradeText" style="color:#ccc;margin-top:10px"></p><button onclick="cancelMatchmaking()" style="margin-top:30px;width:auto;padding:12px 30px;background:#ff6b6b;color:#fff">Cancel</button></div>
-<a href="https://chat.whatsapp.com/CmvdLsifPKS51OyRnrITFz" target="_blank" id="waFloatBtn" class="wa-float" title="Join WhatsApp Group"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
+<a href="https://chat.whatsapp.com/CmvdLsifPKS51OyRnrITFz" target="_blank" id="waFloatBtn" class="wa-float" title="Join WhatsApp Group"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
 
 <div id="imageViewerModal"><div class="iv-top-bar"><span id="ivTitle" style="color:#fff;font-weight:bold;font-size:14px">📷 Photo</span><div style="display:flex;gap:8px"><button onclick="saveImageFromViewer()" style="width:auto;padding:8px 16px;background:#51cf66;color:#000;font-weight:bold;border-radius:8px;font-size:13px">💾 Save</button><button onclick="closeImageViewer()" style="width:auto;padding:8px 16px;background:#ff6b6b;color:#fff;border-radius:8px;font-size:13px">✕ Close</button></div></div><div class="iv-img-wrap"><img id="imageViewerImg" src="" alt="Photo"></div></div>
 
@@ -433,7 +433,7 @@ function claimReferralBonus(){if(!db||!myUid)return;db.ref('referrals/'+myUid).o
 
 function renderGrades(){var g=document.getElementById('gradeGrid'),h='';PVP_GRADES.forEach(function(gr){h+='<div class="grade-card" onclick="joinPvP('+gr.id+')"><div class="grade-icon">'+gr.icon+'</div><h3 style="color:#fff;font-size:16px">'+gr.name+'</h3><div class="grade-entry">Pay: MWK '+gr.entryMWK+'</div><div class="grade-prize">Win: MWK '+gr.winMWK+'</div></div>'});g.innerHTML=h;showBalance()}
 
-function joinPvP(gid){if(!db||!myUid){alert('Login first');return}var gr=PVP_GRADES.find(function(g){return g.id===gid});if(!gr)return;db.ref('leaderboard_all/'+myUid+'/mwk').once('value',function(s){var b=s.val()||0;if(b<gr.entryMWK){alert('Not enough balance! Need MWK '+gr.entryMWK);return}document.getElementById('searchGradeText').innerText=gr.name+' - MWK '+gr.entryMWK;document.getElementById('searchingOverlay').style.display='flex';db.ref('pvp_queue/'+gid+'/'+myUid).set({timestamp:Date.now(),entryMWK:gr.entryMWK})})}
+function joinPvP(gid){if(!db||!myUid){alert('Login first');return}var gr=PVP_GRADES.find(function(g){return g.id===gid});if(!gr)return;db.ref('leaderboard_all/'+myUid+'/mwk').once('value',function(s){var b=s.val()||0;if(b<gr.entryMWK){alert('Not enough balance! Need MWK '+gr.entryMWK);return}document.getElementById('searchGradeText').innerText=gr.name+' - MWK '+gr.entryMWK;document.getElementById('searchingOverlay').style.display='flex';var queueRef=db.ref('pvp_queue/'+gid+'/'+myUid);queueRef.set({timestamp:Date.now(),entryMWK:gr.entryMWK});queueRef.onDisconnect().remove();})}
 
 if(db){db.ref('pvp_queue').on('value',function(s){if(!myUid)return;s.forEach(function(gs){var gid=gs.key,pl=[];gs.forEach(function(ps){pl.push(ps.key)});if(pl.length>=2&&(pl.indexOf(myUid)>=0)){var sorted=pl.slice().sort();var p1=sorted[0],p2=sorted[1];var gameId='game_'+gid+'_'+p1+'_'+p2+'_'+Date.now();var gd=PVP_GRADES.find(function(g){return g.id===parseInt(gid)});var entryMWK=gd.entryMWK;if(myUid!==p1)return;db.ref('pvp_queue/'+gid+'/'+p1).remove();db.ref('pvp_queue/'+gid+'/'+p2).remove();db.ref('leaderboard_all/'+p1+'/mwk').once('value',function(s1){var b1=s1.val()||0;if(b1<entryMWK){db.ref('pvp_queue/'+gid+'/'+p2).set({timestamp:Date.now(),entryMWK:entryMWK});if(myUid===p1){alert('❌ Not enough balance! Match cancelled.');document.getElementById('searchingOverlay').style.display='none'}return}db.ref('leaderboard_all/'+p1).update({mwk:b1-entryMWK},function(e1){if(e1){db.ref('pvp_queue/'+gid+'/'+p2).set({timestamp:Date.now(),entryMWK:entryMWK});return}db.ref('leaderboard_all/'+p2+'/mwk').once('value',function(s2){var b2=s2.val()||0;if(b2<entryMWK){db.ref('leaderboard_all/'+p1+'/mwk').once('value',function(s1b){db.ref('leaderboard_all/'+p1).update({mwk:(s1b.val()||0)+entryMWK})});db.ref('pvp_queue/'+gid+'/'+p1).set({timestamp:Date.now(),entryMWK:entryMWK});return}db.ref('leaderboard_all/'+p2).update({mwk:b2-entryMWK},function(e2){if(e2){db.ref('leaderboard_all/'+p1+'/mwk').once('value',function(s1b){db.ref('leaderboard_all/'+p1).update({mwk:(s1b.val()||0)+entryMWK})});db.ref('pvp_queue/'+gid+'/'+p1).set({timestamp:Date.now(),entryMWK:entryMWK});return}var ib=[];for(var r=0;r<8;r++){for(var c=0;c<8;c++){ib.push((r+c)%2&&r<3?-1:(r+c)%2&&r>4?1:0)}}db.ref('pvp_games/'+gameId).transaction(function(data){if(data===null||(data&&data.status==='finished')){return{p1:p1,p2:p2,gradeId:gid,winMWK:gd.winMWK,entryMWK:entryMWK,board:ib,turn:1,status:'playing',winner:null,created:Date.now(),drawCounter:0,drawTargetPlayer:0}}return data})})})})})}})})}
 
@@ -460,7 +460,6 @@ function makePvPMove(fR,fC,tR,tC){
     b[tR*8+tC]=p;
     b[fR*8+fC]=0;
     
-    // BUG FIX: Properly detect if a King actually captured a piece during a long jump
     var wasCapture=false;
     if(Math.abs(p)===2){ 
         var dRk=Math.sign(tR-fR),dCk=Math.sign(tC-fC);
@@ -560,13 +559,11 @@ function submitWithdrawRequest(){
   var m=document.getElementById("msg");
   m.innerHTML='<span class="success">Processing...</span>';
   
-  // NEW: Check maximum withdrawal limit
   if(a > 50000) {
     m.innerHTML='<span class="error">⚠️ Maximum withdrawal is 50,000 MWK per request.</span>';
     return;
   }
 
-  // SECURITY CHECK: Scan deposit history for an 'approved' deposit
   db.ref('deposit_requests').orderByChild('uid').equalTo(myUid).once('value', function(depSnap) {
     var hasApprovedDeposit = false;
     depSnap.forEach(function(child) {
@@ -578,7 +575,6 @@ function submitWithdrawRequest(){
       return;
     }
     
-    // If they have deposited, proceed to check balance and withdraw
     db.ref('leaderboard_all/'+myUid).once('value',function(s){
       var d=s.val()||{};
       var cb=d.mwk||0;
