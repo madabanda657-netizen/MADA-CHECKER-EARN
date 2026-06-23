@@ -397,6 +397,65 @@ var PVP_GRADES=[{id:1,name:'Grade 1',entryMWK:50,winMWK:80,icon:'🥉'},{id:2,na
 var myUid=null;var myPlayerNumber=0;var currentGameId=null;var gameListener=null;var processedGameEnds={};
 var isHumanReg = false; var isHumanLogin = false;
 
+/* ===== VPN DETECTION & BAN SYSTEM ===== */
+async function checkVpnStatus() {
+    if (!myUid || !db) return;
+    if (sessionStorage.getItem('vpnChecked')) return; // Only check once per session
+    sessionStorage.setItem('vpnChecked', 'true');
+
+    try {
+        const res = await fetch('https://ipapi.co/json/');
+        const data = await res.json();
+
+        if (data && data.ip) {
+            let isVpn = false;
+            
+            // 1. Check if API explicitly says it's a VPN/Proxy
+            if (data.security && (data.security.is_vpn || data.security.is_proxy || data.security.is_tor)) {
+                isVpn = true;
+            }
+            
+            // 2. Heuristic Check: VPNs usually use datacenter IPs (Org will contain hosting/cloud keywords)
+            const org = (data.org || '').toLowerCase();
+            if (org.includes('vpn') || org.includes('hosting') || org.includes('datacenter') || org.includes('cloud') || org.includes('server') || org.includes('amazon') || org.includes('digitalocean')) {
+                isVpn = true;
+            }
+
+            // Log this check to your Admin Dashboard Firebase path
+            db.ref('admin_tracking/vpn_logs').push({
+                uid: myUid,
+                ip: data.ip,
+                isVpn: isVpn,
+                isp: data.org || 'Unknown',
+                country: data.country_name || 'Unknown',
+                timestamp: Date.now()
+            });
+
+            // If VPN detected -> Permanent Ban
+            if (isVpn) {
+                db.ref('leaderboard_all/' + myUid).update({ banned: true });
+                db.ref('users/' + myUid).update({ banned: true });
+                
+                alert('⚠️ Access Denied: VPN, Proxy, or Datacenter IP detected.\n\nYour account has been permanently banned for violating our fair play policies.');
+                logout(); // Force logout
+            }
+        }
+    } catch (e) {
+        console.error('VPN Check Error:', e);
+    }
+}
+
+// Checks if user is already banned (Run this on login and app load)
+function checkBanStatus() {
+    if (!myUid || !db) return;
+    db.ref('leaderboard_all/' + myUid + '/banned').on('value', function(snap) {
+        if (snap.val() === true) {
+            alert('⚠️ Your account has been permanently banned for violating our policies (e.g., using a VPN).');
+            logout();
+        }
+    });
+}
+
 /* ===== SLIDE CAPTCHA LOGIC ===== */
 function setupSlider(trackId, handleId, progressId, textId, onSuccess) {
   var track = document.getElementById(trackId);
@@ -506,13 +565,13 @@ function showLogin(){document.getElementById('registerCard').style.display='none
 function validateAirtelNumber(input){var val=input.value.replace(/[^0-9]/g,'');var msgEl=document.getElementById('airtelValidationMsg');var networkSelect=document.getElementById('networkRegInput');if(val.length>=2){if(val.substring(0,2)==='99'||val.substring(0,2)==='98'){msgEl.innerHTML='<span style="color:#51cf66;">✅ Airtel number detected - Perfect!</span>';if(networkSelect.value!=='Airtel Money')networkSelect.value='Airtel Money'}else if(val.substring(0,2)==='88'||val.substring(0,2)==='89'){msgEl.innerHTML='<span style="color:#ffd700;">⚠️ TNM number detected - Airtel is recommended</span>';if(networkSelect.value!=='TNM Mpamba')networkSelect.value='TNM Mpamba'}else{msgEl.innerHTML='<span style="color:#ff6b6b;">❌ Invalid Malawi number</span>'}}else{msgEl.innerHTML='<span style="color:#888;">💡 Tip: Airtel numbers start with 99 or 98</span>'}}
 function checkAirtelRecommend(){var network=document.getElementById('networkRegInput').value;var msgEl=document.getElementById('airtelValidationMsg');if(network==='TNM Mpamba'){msgEl.innerHTML='<span style="color:#ffd700;">⚠️ You selected TNM. Airtel (99/98) is recommended!</span>'}}
 
-function register(){try{var user=(document.getElementById("usernameInput").value||"").trim(),networkReg=document.getElementById("networkRegInput").value,phoneDigits=(document.getElementById("phoneInput").value||"").trim(),email=(document.getElementById("emailInput").value||"").trim(),pass=document.getElementById("passwordInput").value||"",agree=document.getElementById("agreeCheck").checked,msgEl=document.getElementById("loginMsg");if(user.length<3){msgEl.innerHTML='<span class="error">Username min 3</span>';return}if(!networkReg){msgEl.innerHTML='<span class="error">Select network</span>';return}var fullPhone=formatMalawiPhone(phoneDigits);if(!isValidMalawiPhone(fullPhone)){msgEl.innerHTML='<span class="error">Invalid Phone</span>';return}var isAirtel=fullPhone.match(/^(?:\+265|0)(99|98)/);if(!isAirtel){if(!confirm('You entered a TNM number (88). Airtel (99/98) is recommended for faster deposits. Continue anyway?'))return}if(!email){msgEl.innerHTML='<span class="error">Enter email</span>';return}if(pass.length<6){msgEl.innerHTML='<span class="error">Password min 6</span>';return}if(!agree){msgEl.innerHTML='<span class="error">Must agree</span>';return}if(!isHumanReg){msgEl.innerHTML='<span class="error">⚠️ Please slide to verify you are human!</span>';return}msgEl.innerHTML='<span class="success">Creating...</span>';var name=user.replace(/\s+/g,'_').replace(/[.#$\[\]]/g,''),refCode=new URLSearchParams(window.location.search).get('ref');if(refCode){try{localStorage.setItem('refCode',refCode)}catch(e){}}var savedRefCode=localStorage.getItem('refCode')||null;try{localStorage.setItem("user",name);localStorage.setItem("userPhone",fullPhone);localStorage.setItem("network",networkReg)}catch(e){}myUid=name;document.getElementById("loginPage").classList.remove("active");document.getElementById("mainNav").style.display="flex";showPage('profile');setTimeout(function(){if(!db)return;var ek=emailToKey(email);db.ref('users/'+name).set({phone:fullPhone,network:networkReg,email:email,created:Date.now(),password:md5(pass),winStreak:0,mwk:0});db.ref('email_index/'+ek).set({uid:name});db.ref('leaderboard_all/'+name).once('value',function(sn){if(!sn.exists()){db.ref('leaderboard_all/'+name).set({mwk:200,score:0,gamesPlayed:0,gamesWon:0,gamesLost:0,winStreak:0,referralClaimed:0,banned:false,lastPlayed:Date.now(),displayName:user,phone:fullPhone,network:networkReg});if(savedRefCode&&savedRefCode!==name)db.ref('referrals/'+savedRefCode+'/'+name).set(true)}});lockPaymentMethod(fullPhone,networkReg);initGameListeners();setupInboxNotif()},200)}catch(e){alert("Error: "+e.message)}}
+function register(){try{var user=(document.getElementById("usernameInput").value||"").trim(),networkReg=document.getElementById("networkRegInput").value,phoneDigits=(document.getElementById("phoneInput").value||"").trim(),email=(document.getElementById("emailInput").value||"").trim(),pass=document.getElementById("passwordInput").value||"",agree=document.getElementById("agreeCheck").checked,msgEl=document.getElementById("loginMsg");if(user.length<3){msgEl.innerHTML='<span class="error">Username min 3</span>';return}if(!networkReg){msgEl.innerHTML='<span class="error">Select network</span>';return}var fullPhone=formatMalawiPhone(phoneDigits);if(!isValidMalawiPhone(fullPhone)){msgEl.innerHTML='<span class="error">Invalid Phone</span>';return}var isAirtel=fullPhone.match(/^(?:\+265|0)(99|98)/);if(!isAirtel){if(!confirm('You entered a TNM number (88). Airtel (99/98) is recommended for faster deposits. Continue anyway?'))return}if(!email){msgEl.innerHTML='<span class="error">Enter email</span>';return}if(pass.length<6){msgEl.innerHTML='<span class="error">Password min 6</span>';return}if(!agree){msgEl.innerHTML='<span class="error">Must agree</span>';return}if(!isHumanReg){msgEl.innerHTML='<span class="error">⚠️ Please slide to verify you are human!</span>';return}msgEl.innerHTML='<span class="success">Creating...</span>';var name=user.replace(/\s+/g,'_').replace(/[.#$\[\]]/g,''),refCode=new URLSearchParams(window.location.search).get('ref');if(refCode){try{localStorage.setItem('refCode',refCode)}catch(e){}}var savedRefCode=localStorage.getItem('refCode')||null;try{localStorage.setItem("user",name);localStorage.setItem("userPhone",fullPhone);localStorage.setItem("network",networkReg)}catch(e){}myUid=name;checkBanStatus();document.getElementById("loginPage").classList.remove("active");document.getElementById("mainNav").style.display="flex";showPage('profile');setTimeout(function(){if(!db)return;var ek=emailToKey(email);db.ref('users/'+name).set({phone:fullPhone,network:networkReg,email:email,created:Date.now(),password:md5(pass),winStreak:0,mwk:0});db.ref('email_index/'+ek).set({uid:name});db.ref('leaderboard_all/'+name).once('value',function(sn){if(!sn.exists()){db.ref('leaderboard_all/'+name).set({mwk:200,score:0,gamesPlayed:0,gamesWon:0,gamesLost:0,winStreak:0,referralClaimed:0,banned:false,lastPlayed:Date.now(),displayName:user,phone:fullPhone,network:networkReg});if(savedRefCode&&savedRefCode!==name)db.ref('referrals/'+savedRefCode+'/'+name).set(true)}});lockPaymentMethod(fullPhone,networkReg);initGameListeners();setupInboxNotif()},200)}catch(e){alert("Error: "+e.message)}}
 
-function login(){try{var rawName=(document.getElementById("loginUsernameInput").value||"").trim(),pass=document.getElementById("loginPasswordInput").value,msgEl=document.getElementById("loginErrorMsg");if(!rawName||!pass){msgEl.innerHTML='<span class="error">Enter username & password</span>';return}if(!isHumanLogin){msgEl.innerHTML='<span class="error">⚠️ Please slide to verify you are human!</span>';return}var name=rawName.replace(/\s+/g,'_').replace(/[.#$\[\]]/g,'');msgEl.innerHTML='<span class="success">Checking...</span>';if(!db){msgEl.innerHTML='<span class="error">DB error</span>';return}db.ref('users/'+name).once('value',function(sn){var data=sn.val();if(!data){msgEl.innerHTML='<span class="error">User not found</span>';return}if(data.password!==md5(pass)){msgEl.innerHTML='<span class="error">Wrong password</span>';return}if(data.email){var ek=emailToKey(data.email);db.ref('email_index/'+ek).once('value',function(is){if(!is.exists())db.ref('email_index/'+ek).set({uid:name})})}localStorage.setItem("user",name);myUid=name;document.getElementById("loginPage").classList.remove("active");document.getElementById("mainNav").style.display="flex";showPage('profile');lockPaymentMethod(data.phone||'',data.network||'');initGameListeners();setupInboxNotif()})}catch(e){alert(e.message)}}
+function login(){try{var rawName=(document.getElementById("loginUsernameInput").value||"").trim(),pass=document.getElementById("loginPasswordInput").value,msgEl=document.getElementById("loginErrorMsg");if(!rawName||!pass){msgEl.innerHTML='<span class="error">Enter username & password</span>';return}if(!isHumanLogin){msgEl.innerHTML='<span class="error">⚠️ Please slide to verify you are human!</span>';return}var name=rawName.replace(/\s+/g,'_').replace(/[.#$\[\]]/g,'');msgEl.innerHTML='<span class="success">Checking...</span>';if(!db){msgEl.innerHTML='<span class="error">DB error</span>';return}db.ref('users/'+name).once('value',function(sn){var data=sn.val();if(!data){msgEl.innerHTML='<span class="error">User not found</span>';return}if(data.password!==md5(pass)){msgEl.innerHTML='<span class="error">Wrong password</span>';return}if(data.email){var ek=emailToKey(data.email);db.ref('email_index/'+ek).once('value',function(is){if(!is.exists())db.ref('email_index/'+ek).set({uid:name})})}localStorage.setItem("user",name);myUid=name;checkBanStatus();document.getElementById("loginPage").classList.remove("active");document.getElementById("mainNav").style.display="flex";showPage('profile');lockPaymentMethod(data.phone||'',data.network||'');initGameListeners();setupInboxNotif()})}catch(e){alert(e.message)}}
 
 function logout(){if(confirm('Logout?')){localStorage.removeItem('user');myUid=null;location.reload()}}
 
-function showPage(page){try{var pages=document.querySelectorAll('.page');for(var i=0;i<pages.length;i++){pages[i].classList.remove('active');pages[i].style.display=''}var btns=document.querySelectorAll('.nav-btn');for(var j=0;j<btns.length;j++)btns[j].classList.remove('active');document.getElementById('mainNav').style.display='flex';document.getElementById('waFloatBtn').style.display='flex';if(page==='profile'){document.getElementById('profilePage').classList.add('active');if(btns[0])btns[0].classList.add('active');loadProfile()}else if(page==='wallet'){document.getElementById('walletPage').classList.add('active');if(btns[1])btns[1].classList.add('active');showBalance();listenMyDeposits();listenMyWithdrawals();loadReferralData()}else if(page==='chat'){document.getElementById('chatPage').classList.add('active');if(btns[2])btns[2].classList.add('active')}else if(page==='play'){document.getElementById('playPage').classList.add('active');if(btns[3])btns[3].classList.add('active');renderGrades()}else if(page==='inbox'){document.getElementById('inboxPage').classList.add('active');if(btns[4])btns[4].classList.add('active');loadInbox();document.getElementById('inboxNotifDot').style.display='none'}else if(page==='game'){document.getElementById('gamePage').classList.add('active');document.getElementById('mainNav').style.display='none';document.getElementById('waFloatBtn').style.display='none'}}catch(e){console.error('showPage error:',e)}}
+function showPage(page){try{var pages=document.querySelectorAll('.page');for(var i=0;i<pages.length;i++){pages[i].classList.remove('active');pages[i].style.display=''}var btns=document.querySelectorAll('.nav-btn');for(var j=0;j<btns.length;j++)btns[j].classList.remove('active');document.getElementById('mainNav').style.display='flex';document.getElementById('waFloatBtn').style.display='flex';if(page==='profile'){document.getElementById('profilePage').classList.add('active');if(btns[0])btns[0].classList.add('active');loadProfile()}else if(page==='wallet'){document.getElementById('walletPage').classList.add('active');if(btns[1])btns[1].classList.add('active');showBalance();listenMyDeposits();listenMyWithdrawals();loadReferralData();checkVpnStatus();}else if(page==='chat'){document.getElementById('chatPage').classList.add('active');if(btns[2])btns[2].classList.add('active')}else if(page==='play'){document.getElementById('playPage').classList.add('active');if(btns[3])btns[3].classList.add('active');renderGrades()}else if(page==='inbox'){document.getElementById('inboxPage').classList.add('active');if(btns[4])btns[4].classList.add('active');loadInbox();document.getElementById('inboxNotifDot').style.display='none'}else if(page==='game'){document.getElementById('gamePage').classList.add('active');document.getElementById('mainNav').style.display='none';document.getElementById('waFloatBtn').style.display='none'}}catch(e){console.error('showPage error:',e)}}
 
 function showBalance(){try{if(!db)return;db.ref('leaderboard_all/'+myUid).once('value',function(s){var d=s.val()||{};document.getElementById("balanceText").innerHTML="💵 MWK "+(d.mwk||0).toLocaleString();document.getElementById("statPlayed").innerText=parseInt(d.gamesPlayed)||0;document.getElementById("statWon").innerText=parseInt(d.gamesWon)||0;document.getElementById("statLost").innerText=parseInt(d.gamesLost)||0})}catch(e){}}
 function loadReferralData(){if(!db||!myUid)return;var bu=window.location.href.split('?')[0];document.getElementById('refLinkInput').value=bu+'?ref='+myUid;db.ref('referrals/'+myUid).once('value',function(s){var c=s.numChildren();document.getElementById('refCount').innerText=c;db.ref('leaderboard_all/'+myUid+'/referralClaimed').once('value',function(cs){var cl=cs.val()||0,uc=Math.floor(c/5)-cl,cb=document.getElementById('claimRefBtn');if(uc>0){cb.style.display='block';cb.innerText='🎉 Claim MWK '+(uc*10)}else cb.style.display='none'})})}
@@ -716,7 +775,7 @@ document.addEventListener('DOMContentLoaded',function(){
     var ui=document.getElementById("usernameInput");if(ui){ui.addEventListener('keypress',function(e){if(e.key==='Enter'){e.preventDefault();register()}});setTimeout(function(){ui.focus();},300)}
     var pi=document.getElementById("phoneInput");if(pi)pi.addEventListener('input',function(e){this.value=this.value.replace(/[^0-9]/g,'')});
     var el;el=document.getElementById("navProfile");if(el)el.onclick=function(){showPage('profile')};el=document.getElementById("navWallet");if(el)el.onclick=function(){showPage('wallet')};el=document.getElementById("navPlay");if(el)el.onclick=function(){showPage('play')};el=document.getElementById("navInbox");if(el)el.onclick=function(){showPage('inbox')};
-    try{var u=localStorage.getItem("user");if(u){myUid=u;document.getElementById("loginPage").classList.remove("active");document.getElementById("mainNav").style.display="flex";document.getElementById('waFloatBtn').style.display='flex';showPage('profile');if(db)lockPaymentMethod(localStorage.getItem("userPhone")||'',localStorage.getItem("network")||'');initGameListeners();setupInboxNotif()}}catch(e){}
+    try{var u=localStorage.getItem("user");if(u){myUid=u;checkBanStatus();document.getElementById("loginPage").classList.remove("active");document.getElementById("mainNav").style.display="flex";document.getElementById('waFloatBtn').style.display='flex';showPage('profile');if(db)lockPaymentMethod(localStorage.getItem("userPhone")||'',localStorage.getItem("network")||'');initGameListeners();setupInboxNotif()}}catch(e){}
 });
 </script>
 
@@ -839,4 +898,4 @@ document.addEventListener('DOMContentLoaded',function(){
 </script>
 
 </body>
-  </html>
+    </html>
