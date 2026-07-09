@@ -434,7 +434,7 @@
     </div>
     
     <div class="card" style="border-color:#ff6b6b44"><h3>⚠️ Rules</h3><div style="text-align:left;color:#ccc;line-height:1.8;font-size:12px">1. Process time up to <b style="color:#fff">3 hours</b> (usually instant).<br>2. Min withdrawal 500 MWK.<br>3. Withdrawals sent to your registered phone number.<br>4. Fake activity = Permanent ban.<br>5. <b style="color:#ff6b6b">VPN usage = Permanent ban.</b></div></div>
-    <div style="margin-top:20px;padding:20px;background:#111;border-radius:15px;border:1px solid #222"><div style="font-size:28px;margin-bottom:10px">🔞</div><p style="color:#ff6b6b;font-weight:bold;font-size:16px">18+ Only</p><div style="display:flex;justify-content:center;gap:15px;font-size:13px;margin:15px 0"><a href="#" onclick="document.getElementById('termsModal').style.display='flex';return false" style="color:#00cc8">Terms</a><a href="#" onclick="document.getElementById('privacyModal').style.display='flex';return false" style="color:#00ccff">Privacy</a></div><a href="https://chat.whatsapp.com/CmvdLsifPKS51OyRnrITFz" target="_blank" style="display:block;background:#25d366;color:#fff;padding:12px;border-radius:10px;text-decoration:none;font-weight:bold;font-size:14px">💬 Join WhatsApp Group</a></div>
+    <div style="margin-top:20px;padding:20px;background:#111;border-radius:15px;border:1px solid #222"><div style="font-size:28px;margin-bottom:10px">🔞</div><p style="color:#ff6b6b;font-weight:bold;font-size:16px">18+ Only</p><div style="display:flex;justify-content:center;gap:15px;font-size:13px;margin:15px 0"><a href="#" onclick="document.getElementById('termsModal').style.display='flex';return false" style="color:#00ccff">Terms</a><a href="#" onclick="document.getElementById('privacyModal').style.display='flex';return false" style="color:#00ccff">Privacy</a></div><a href="https://chat.whatsapp.com/CmvdLsifPKS51OyRnrITFz" target="_blank" style="display:block;background:#25d366;color:#fff;padding:12px;border-radius:10px;text-decoration:none;font-weight:bold;font-size:14px">💬 Join WhatsApp Group</a></div>
     
     <!-- POWERED BY PAYCHANGU -->
     <div class="paychangu-footer">
@@ -706,7 +706,17 @@ function logout(){if(confirm('Logout?')){localStorage.removeItem('user');myUid=n
 
 function showPage(page){try{var pages=document.querySelectorAll('.page');for(var i=0;i<pages.length;i++){pages[i].classList.remove('active');pages[i].style.display=''}var btns=document.querySelectorAll('.nav-btn');for(var j=0;j<btns.length;j++)btns[j].classList.remove('active');document.getElementById('mainNav').style.display='flex';document.getElementById('waFloatBtn').style.display='flex';if(page==='profile'){document.getElementById('profilePage').classList.add('active');if(btns[0])btns[0].classList.add('active');loadProfile()}else if(page==='wallet'){document.getElementById('walletPage').classList.add('active');if(btns[1])btns[1].classList.add('active');showBalance();listenMyDeposits();listenMyWithdrawals();loadReferralData();checkVpnStatus();}else if(page==='chat'){document.getElementById('chatPage').classList.add('active');if(btns[2])btns[2].classList.add('active')}else if(page==='play'){document.getElementById('playPage').classList.add('active');if(btns[3])btns[3].classList.add('active');renderGrades()}else if(page==='inbox'){document.getElementById('inboxPage').classList.add('active');if(btns[4])btns[4].classList.add('active');loadInbox();document.getElementById('inboxNotifDot').style.display='none'}else if(page==='game'){document.getElementById('gamePage').classList.add('active');document.getElementById('mainNav').style.display='none';document.getElementById('waFloatBtn').style.display='none'}}catch(e){console.error('showPage error:',e)}}
 
-function showBalance(){try{if(!db)return;db.ref('leaderboard_all/'+myUid).once('value',function(s){var d=s.val()||{};document.getElementById("balanceText").innerHTML="💵 MWK "+(d.mwk||0).toLocaleString();document.getElementById("statPlayed").innerText=parseInt(d.gamesPlayed)||0;document.getElementById("statWon").innerText=parseInt(d.gamesWon)||0;document.getElementById("statLost").innerText=parseInt(d.gamesLost)||0})}catch(e){}}
+function showBalance(){
+  if(!db||!myUid) return;
+  db.ref('leaderboard_all/'+myUid).on('value',function(s){
+    var d=s.val()||{};
+    var bal=d.mwk||0;
+    document.getElementById("balanceText").innerHTML="💵 MWK "+bal.toLocaleString();
+    document.getElementById("statPlayed").innerText=parseInt(d.gamesPlayed)||0;
+    document.getElementById("statWon").innerText=parseInt(d.gamesWon)||0;
+    document.getElementById("statLost").innerText=parseInt(d.gamesLost)||0;
+  });
+}
 function loadReferralData(){if(!db||!myUid)return;var bu=window.location.href.split('?')[0];document.getElementById('refLinkInput').value=bu+'?ref='+myUid;db.ref('referrals/'+myUid).once('value',function(s){var c=s.numChildren();document.getElementById('refCount').innerText=c;db.ref('leaderboard_all/'+myUid+'/referralClaimed').once('value',function(cs){var cl=cs.val()||0,uc=Math.floor(c/5)-cl,cb=document.getElementById('claimRefBtn');if(uc>0){cb.style.display='block';cb.innerText='🎉 Claim MWK '+(uc*10)}else cb.style.display='none'})})}
 function copyRefLink(){var ct=document.getElementById("refLinkInput");if(navigator.clipboard)navigator.clipboard.writeText(ct.value);else{ct.select();document.execCommand("copy")}alert("Copied!")}
 function claimReferralBonus(){if(!db||!myUid)return;db.ref('referrals/'+myUid).once('value',function(s){var c=s.numChildren();db.ref('leaderboard_all/'+myUid).once('value',function(us){var ud=us.val()||{},cl=ud.referralClaimed||0,uc=Math.floor(c/5)-cl;if(uc>0){db.ref('leaderboard_all/'+myUid).update({mwk:(ud.mwk||0)+(uc*10),referralClaimed:cl+uc},function(e){if(!e){alert('🎉 Claimed MWK '+(uc*10)+'!');showBalance();loadReferralData()}})}})})}
@@ -1092,4 +1102,4 @@ document.addEventListener('DOMContentLoaded',function(){
 </script>
 
 </body>
-    </html>
+                                                                                                                                                                                                                                                                                                                              </html>
