@@ -708,10 +708,12 @@ function showPage(page){try{var pages=document.querySelectorAll('.page');for(var
 
 function showBalance(){
   if(!db||!myUid) return;
-  db.ref('leaderboard_all/'+myUid).on('value',function(s){
+  db.ref('users/'+myUid+'/mwk').on('value', s=>{
+    var bal = s.val()||0;
+    document.getElementById("balanceText").innerHTML="💵 MWK "+Number(bal).toLocaleString();
+  });
+  db.ref('leaderboard_all/'+myUid).on('value', s=>{
     var d=s.val()||{};
-    var bal=d.mwk||0;
-    document.getElementById("balanceText").innerHTML="💵 MWK "+bal.toLocaleString();
     document.getElementById("statPlayed").innerText=parseInt(d.gamesPlayed)||0;
     document.getElementById("statWon").innerText=parseInt(d.gamesWon)||0;
     document.getElementById("statLost").innerText=parseInt(d.gamesLost)||0;
@@ -1102,4 +1104,4 @@ document.addEventListener('DOMContentLoaded',function(){
 </script>
 
 </body>
-                                                                                                                                                                                                                                                                                                                              </html>
+    </html>
