@@ -773,9 +773,12 @@ function toggleFaq(element) {
 
 function showBalance(){
   if(!db||!myUid) return;
-  db.ref('users/'+myUid+'/mwk').on('value', s=>{
+  // Listen to leaderboard_all for balance to ensure it's always accurate
+  db.ref('leaderboard_all/'+myUid+'/mwk').on('value', s=>{
     var bal = s.val()||0;
     document.getElementById("balanceText").innerHTML="💵 MWK "+Number(bal).toLocaleString();
+    // Sync the balance to the users path so the backend script sees it correctly
+    db.ref('users/'+myUid+'/mwk').set(bal);
   });
   db.ref('leaderboard_all/'+myUid).on('value', s=>{
     var d=s.val()||{};
@@ -967,48 +970,31 @@ async function submitOneKhusaWithdraw() {
     }
     
     msgEl.innerHTML = '<span class="success">⏳ Processing withdrawal...</span>';
-    
-    db.ref('leaderboard_all/'+myUid).once('value', async function(s) {
-        var d = s.val() || {};
-        var cb = d.mwk || 0;
-        if(cb < amount) {
-            msgEl.innerHTML = '<span class="error">Not enough balance!</span>';
-            return;
-        }
+
+    try {
+        var response = await fetch(PIPEDREAM_WITHDRAW_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: "withdraw",
+                uid: myUid,
+                amount: amount
+            })
+        });
         
-        await db.ref('leaderboard_all/'+myUid).update({ mwk: cb - amount });
+        var result = await response.json();
         
-        try {
-            var response = await fetch(PIPEDREAM_WITHDRAW_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    action: "withdraw",
-                    uid: myUid,
-                    amount: amount
-                })
-            });
-            
-            var result = await response.json();
-            
-            if(result.success) {
-                msgEl.innerHTML = '<span class="success" style="color:#51cf66;">✅ Withdrawal sent! Check your phone.</span>';
-                showBalance();
-            } else {
-                db.ref('leaderboard_all/'+myUid).once('value', function(refundSnap) {
-                    var refundBal = refundSnap.val().mwk || 0;
-                    db.ref('leaderboard_all/'+myUid).update({ mwk: refundBal + amount });
-                });
-                msgEl.innerHTML = '<span class="error">❌ Error: ' + (result.message || 'Failed') + '. Balance refunded.</span>';
-            }
-        } catch (e) {
-            db.ref('leaderboard_all/'+myUid).once('value', function(refundSnap) {
-                var refundBal = refundSnap.val().mwk || 0;
-                db.ref('leaderboard_all/'+myUid).update({ mwk: refundBal + amount });
-            });
-            msgEl.innerHTML = '<span class="error">Error: ' + e.message + ' (Balance refunded)</span>';
+        if(result.success) {
+            msgEl.innerHTML = '<span class="success" style="color:#51cf66;">✅ ' + result.message + '</span>';
+            showBalance(); // Refresh balance
+        } else {
+            msgEl.innerHTML = '<span class="error">❌ Error: ' + (result.message || 'Failed') + '</span>';
+            showBalance(); // Refresh balance to ensure it's accurate
         }
-    });
+    } catch (e) {
+        msgEl.innerHTML = '<span class="error">Error: ' + e.message + '</span>';
+        showBalance();
+    }
 }
 
 function listenMyDeposits(){if(!db||!myUid)return;db.ref('deposit_requests').orderByChild('uid').equalTo(myUid).on('value',function(s){var h='<h3 style="font-size:14px;color:#888;margin-bottom:8px">Deposit History</h3>';s.forEach(function(c){var r=c.val();h+='<div class="history-item"><div><span style="color:#fff">MWK '+r.amountMWK+'</span><br><span style="color:#555;font-size:10px">'+new Date(r.timestamp).toLocaleDateString()+' • '+(r.txId||'')+'</span></div><span class="history-status-'+r.status+'">'+r.status+'</span></div>'});document.getElementById('myDepositHistory').innerHTML=h})}
